@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KubeSpace | Cloud Status</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #e5e7eb;
+        }
+
+        header {
+            padding: 24px 8%;
+            border-bottom: 1px solid #263247;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .badge {
+            color: #86efac;
+            background: #123326;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        main {
+            max-width: 1050px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            margin-bottom: 40px;
+        }
+
+        .eyebrow {
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 12px;
+        }
+
+        h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            margin: 14px 0;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            line-height: 1.7;
+            max-width: 600px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: #151f32;
+            border: 1px solid #29364d;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .card-label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .value {
+            font-size: 34px;
+            font-weight: bold;
+            margin: 18px 0 10px;
+        }
+
+        .healthy {
+            color: #86efac;
+        }
+
+        .note {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        footer {
+            margin-top: 60px;
+            border-top: 1px solid #263247;
+            padding-top: 24px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">☁ KubeSpace</div>
+        <div class="badge">● Demo environment</div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="eyebrow">Cloud infrastructure</div>
+            <h1>Your infrastructure,<br>at a glance.</h1>
+            <p class="subtitle">
+                Welcome to KubeSpace, a simple dashboard built with Node.js
+                and prepared for containerisation and Kubernetes deployment.
+            </p>
+        </section>
+
+        <section class="grid">
+            <article class="card">
+                <div class="card-label">Application status</div>
+                <div class="value healthy">Online</div>
+                <div class="note">Demo status</div>
+            </article>
+
+            <article class="card">
+                <div class="card-label">Demo Pods</div>
+                <div class="value">3 / 3</div>
+                <div class="note">Illustrative data only</div>
+            </article>
+
+            <article class="card">
+                <div class="card-label">Demo deployment</div>
+                <div class="value">Ready</div>
+                <div class="note">Illustrative data only</div>
+            </article>
+        </section>
+
+        <footer>
+            KubeSpace · Built with Node.js ·
+            <span id="clock"></span>
+            <p>Infrastructure metrics shown here are examples, not live cluster data.</p>
+        </footer>
+    </main>
+
+    <script>
+        function updateClock() {
+            document.getElementById("clock").textContent =
+                new Date().toLocaleTimeString();
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+
+</html>

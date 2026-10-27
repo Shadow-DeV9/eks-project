@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: kubespace
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: kubespace
+
+  template:
+    metadata:
+      labels:
+        app: kubespace
+
+    spec:
+      
+      containers:
+        - name: kubespace
+          image: 343918153740.dkr.ecr.eu-north-1.amazonaws.com/senbonzakura-ecr:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+
+          env:
+            - name: APP_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: kubespace-config
+                  key: APP_MODE
+            - name: APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kubespace-secret
+                  key: APP_TOKEN
+            
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+
+                  
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20

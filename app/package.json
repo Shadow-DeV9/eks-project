@@ -1,0 +1,9 @@
+{
+    "name": "kubespace",
+    "version": "1.0.0",
+    "description": "A cloud status dashboard for Kubernetes learning",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    }
+}
