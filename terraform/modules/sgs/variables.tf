@@ -5,6 +5,6 @@ variable "vpc_id" {
 
 variable "cidr_block" {
   description = "The CIDR block for the VPC."
-  default     = "0.0.0/0"
+  default     = "0.0.0.0/0"
   type        = string
 }
