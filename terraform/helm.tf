@@ -1,74 +1,52 @@
 resource "helm_release" "nginx_ingress" {
   name       = "nginx-ingress-controller"
   repository = "https://helm.nginx.com/stable"
-  chart      = "nginx-ingress-controller"
+  chart      = "nginx-ingress"
+  version    = "2.8.0"
 
   create_namespace = true
   namespace        = "nginx-ingress"
+
+  values = [
+    templatefile("${path.module}/helm-values/nginx-ingress.yaml", {
+      domain_name = var.domain_name
+    })
+  ]
 }
 
 resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
+  version    = "v1.21.3"
 
   create_namespace = true
   namespace        = "cert-manager"
 
-  # set {
-  #    name = "wait-for"
-  #    value = "module.cert_manager_irsa_role.iam_role_arn"
-  #  }
-  # This code above is what my mentor showed however i do not have a module irsa role so how do i work around this bc i belive that i need the cert manager permission role or a separate role that has the cert-manager role
-
-  set = [{
-    name  = "global.imagePullSecrets[0].name"
-    value = "regcred"
-  }]
-
   values = [
-    file("${path.module}/helm-values/cert-manager.yaml")
+    templatefile("${path.module}/helm-values/cert-manager.yaml", {
+      role_arn = aws_iam_role.cert_manager.arn
+    })
   ]
+
+  depends_on = [aws_iam_role_policy_attachment.cert_manager_route53]
 }
 
 resource "helm_release" "external_dns" {
   name       = "external-dns"
-  repository = "https://charts.bitnami.com/bitnami"
+  repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
+  version    = "1.23.0"
 
   create_namespace = true
   namespace        = "external-dns"
 
   values = [
-    file("${path.module}/helm-values/external-dns.yaml")
+    templatefile("${path.module}/helm-values/external-dns.yaml", {
+      domain_name = var.domain_name
+      role_arn    = aws_iam_role.external_dns.arn
+    })
   ]
 
-  set = [{
-    name  = "provider"
-    value = "aws"
-    },
-    {
-      name  = "aws.zoneType"
-      value = "public"
-    },
-    {
-      name  = "txtOwnerId"
-      value = "my-identifier"
-    },
-    {
-      name  = "policy"
-      value = "upsert-only"
-    },
-    {
-      name  = "rbac.create"
-      value = true
-    },
-    {
-      name  = "serviceAccount.create"
-      value = true
-    },
-    {
-      name  = "serviceAccount.name"
-      value = "external-dns-sa"
-  }]
+  depends_on = [aws_iam_role_policy_attachment.external_dns_route53]
 }

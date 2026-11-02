@@ -1,9 +1,8 @@
-ingressShim:
-  defaultACHMEChallangeType: "dns01"
-  deffaultACHMEDNS01ChallangeProvider: "route53"
+crds:
+  enabled: true
 
-extraArgs:
-- --dns01-recursive-nameservers="8.8.8.8:53"
-- --dns01-recursive-nameservers-only
-
-# Course mentions to add serviceAccount with role for cert manager however, he created an irsa role called cert-manager so idk what to do about this part
+serviceAccount:
+  create: true
+  name: cert-manager
+  annotations:
+    eks.amazonaws.com/role-arn: "${role_arn}"

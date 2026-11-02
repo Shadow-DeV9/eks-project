@@ -1,10 +1,25 @@
-provider: aws
+provider:
+  name: aws
+
+sources:
+  - service
+
+policy: upsert-only
+registry: txt
+txtOwnerId: eks-project
+
+domainFilters:
+  - "${domain_name}"
+
+extraArgs:
+  - --aws-zone-type=public
 
 env:
-- name: AWS_DEFAULT_REGION
-  value: eu-north-1
+  - name: AWS_DEFAULT_REGION
+    value: eu-north-1
 
-  domainfilter:
-  - "shoshin.org.uk"
-
-  # again added the cert-manager irsa role but idk what to do about this
+serviceAccount:
+  create: true
+  name: external-dns-sa
+  annotations:
+    eks.amazonaws.com/role-arn: "${role_arn}"
