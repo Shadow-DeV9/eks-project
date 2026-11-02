@@ -9,3 +9,8 @@ output "cluster_certificate_authority_data" {
 output "cluster_id" {
   value = aws_eks_cluster.example.id
 }
+
+output "oidc_issuer" {
+  description = "OIDC issuer URL for the EKS cluster"
+  value       = aws_eks_cluster.example.identity[0].oidc[0].issuer
+}
