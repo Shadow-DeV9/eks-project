@@ -1,0 +1,10 @@
+provider: aws
+
+env:
+- name: AWS_DEFAULT_REGION
+  value: eu-north-1
+
+  domainfilter:
+  - "shoshin.org.uk"
+
+  # again added the cert-manager irsa role but idk what to do about this
