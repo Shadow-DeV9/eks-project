@@ -26,3 +26,10 @@ module "sgs" {
 
   vpc_id = module.vpc.vpc_id
 }
+
+module "irsa" {
+  source = "./modules/irsa"
+
+  oidc_provider_arn       = aws_iam_openid_connect_provider.eks.arn
+  route53_hosted_zone_arn = "arn:aws:route53:::hostedzone/Z0950142301ZY0XM88IDB"
+}

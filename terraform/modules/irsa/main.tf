@@ -1,10 +1,10 @@
-/*module "cert_manager_irsa_role" {
+module "cert_manager_irsa_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
 
   role_name                     = "cert-manager"
   attach_cert_manager_policy    = true
-  cert_manager_hosted_zone_arns = ["arn:aws:route53:::hostedzone/YOUR_HOSTED_ZONE_ID"]
+  cert_manager_hosted_zone_arns = [var.route53_hosted_zone_arn]
 
   oidc_providers = {
     eks = {
@@ -15,7 +15,7 @@
 
 }
 
-module "external_dns_irsa_role" {
+/*module "external_dns_irsa_role" {
   source  = "terraform-aws-modules/iam-oidc/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.0"
 

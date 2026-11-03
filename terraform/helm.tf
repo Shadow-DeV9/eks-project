@@ -5,33 +5,33 @@ resource "helm_release" "nginx_ingress" {
 
   create_namespace = true
   namespace        = "nginx-ingress"
+
+  values = [
+    file("${path.module}/helm-values/nginx-ingress.yaml")
+  ]
+
 }
 
-/* resource "helm_release" "cert_manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-
+resource "helm_release" "cert_manager" {
+  name             = "cert-manager"
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager"
   create_namespace = true
   namespace        = "cert-manager"
 
-  # set {
-  #    name = "wait-for"
-  #    value = "module.cert_manager_irsa_role.iam_role_arn"
-  #  }
-  # This code above is what my mentor showed however i do not have a module irsa role so how do i work around this bc i belive that i need the cert manager permission role or a separate role that has the cert-manager role
-
-  set = [{
-    name  = "global.imagePullSecrets[0].name"
-    value = "regcred"
-  }]
+  set = [
+    {
+      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = module.irsa.cert_manager_role_arn
+    }
+  ]
 
   values = [
     file("${path.module}/helm-values/cert-manager.yaml")
   ]
 }
 
-resource "helm_release" "external_dns" {
+/*resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "external-dns"
@@ -71,4 +71,5 @@ resource "helm_release" "external_dns" {
       name  = "serviceAccount.name"
       value = "external-dns-sa"
   }]
-} */
+} 
+*/
