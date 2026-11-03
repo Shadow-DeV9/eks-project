@@ -1,13 +1,13 @@
 resource "helm_release" "nginx_ingress" {
   name       = "nginx-ingress-controller"
   repository = "https://helm.nginx.com/stable"
-  chart      = "nginx-ingress-controller"
+  chart      = "nginx-ingress"
 
   create_namespace = true
   namespace        = "nginx-ingress"
 }
 
-resource "helm_release" "cert_manager" {
+/* resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
@@ -71,4 +71,4 @@ resource "helm_release" "external_dns" {
       name  = "serviceAccount.name"
       value = "external-dns-sa"
   }]
-}
+} */
