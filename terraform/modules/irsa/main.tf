@@ -8,8 +8,8 @@ module "cert_manager_irsa_role" {
 
   oidc_providers = {
     eks = {
-      provider_arn              = var.oidc_provider_arn
-      namespace_service_account = ["cert-manager:cert-manager"]
+      provider_arn               = var.oidc_provider_arn
+      namespace_service_accounts = ["cert-manager:cert-manager"]
     }
   }
 

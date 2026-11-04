@@ -1,14 +1,9 @@
-ingressShim:
-  defaultACHMEChallangeType: "dns01"
-  deffaultACHMEDNS01ChallangeProvider: "route53"
-
-extraArgs:
-- --dns01-recursive-nameservers="8.8.8.8:53"
-- --dns01-recursive-nameservers-only
-
 crds:
   enabled: true
 
 serviceAccount:
   create: true
   name: cert-manager
+
+startupapicheck:
+  enabled: false
