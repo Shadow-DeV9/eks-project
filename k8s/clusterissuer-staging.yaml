@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+
+    # Email address used for ACME registration
+    email: YOUR_EMAIL
+
+    # Secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-staging
+
+    # Domain ownership validation method
+    solvers:
+      - dns01:
+          route53:
+            region: eu-north-1
+            hostedZoneID: Z0950142301ZY0XM88IDB

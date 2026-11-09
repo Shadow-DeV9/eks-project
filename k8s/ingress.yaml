@@ -2,16 +2,25 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubespace-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+
 spec:
   ingressClassName: nginx
+
   rules:
-  - host: eks.shoshin.org.uk
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: kubespace-service
-              port:
-                number: 80
+    - host: eks.shoshin.org.uk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubespace-service
+                port:
+                  number: 80
+
+  tls:
+    - hosts:
+        - eks.shoshin.org.uk
+      secretName: kubespace-tls
