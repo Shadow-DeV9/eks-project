@@ -31,9 +31,9 @@ resource "helm_release" "cert_manager" {
   ]
 }
 
-/*resource "helm_release" "external_dns" {
+resource "helm_release" "external_dns" {
   name       = "external-dns"
-  repository = "https://charts.bitnami.com/bitnami"
+  repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
 
   create_namespace = true
@@ -43,33 +43,10 @@ resource "helm_release" "cert_manager" {
     file("${path.module}/helm-values/external-dns.yaml")
   ]
 
-  set = [{
-    name  = "provider"
-    value = "aws"
-    },
+  set = [
     {
-      name  = "aws.zoneType"
-      value = "public"
-    },
-    {
-      name  = "txtOwnerId"
-      value = "my-identifier"
-    },
-    {
-      name  = "policy"
-      value = "upsert-only"
-    },
-    {
-      name  = "rbac.create"
-      value = true
-    },
-    {
-      name  = "serviceAccount.create"
-      value = true
-    },
-    {
-      name  = "serviceAccount.name"
-      value = "external-dns-sa"
-  }]
-} 
-*/
+      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = module.irsa.external_dns_role_arn
+    }
+  ]
+}
