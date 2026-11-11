@@ -2,6 +2,7 @@ resource "helm_release" "nginx_ingress" {
   name       = "nginx-ingress-controller"
   repository = "https://helm.nginx.com/stable"
   chart      = "nginx-ingress"
+  version    = "2.8.1"
 
   create_namespace = true
   namespace        = "nginx-ingress"
@@ -18,11 +19,12 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   create_namespace = true
   namespace        = "cert-manager"
+  version          = "v1.21.3"
 
   set = [
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = module.irsa.cert_manager_role_arn
+      value = data.terraform_remote_state.infrastructure.outputs.cert_manager_role_arn
     }
   ]
 
@@ -32,10 +34,10 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "helm_release" "external_dns" {
-  name       = "external-dns"
-  repository = "https://kubernetes-sigs.github.io/external-dns/"
-  chart      = "external-dns"
-
+  name             = "external-dns"
+  repository       = "https://kubernetes-sigs.github.io/external-dns/"
+  chart            = "external-dns"
+  version          = "1.23.0"
   create_namespace = true
   namespace        = "external-dns"
 
@@ -46,7 +48,7 @@ resource "helm_release" "external_dns" {
   set = [
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = module.irsa.external_dns_role_arn
+      value = data.terraform_remote_state.infrastructure.outputs.external_dns_role_arn
     }
   ]
 }

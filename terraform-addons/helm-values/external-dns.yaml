@@ -10,5 +10,7 @@ txtOwnerId: kubespace
 serviceAccount:
   create: true
   name: external-dns
-  annotations:
+env:
+  - name: AWS_DEFAULT_REGION
+    value: eu-north-1
     

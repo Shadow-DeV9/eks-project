@@ -11,6 +11,5 @@ output "cluster_id" {
 }
 
 output "oidc_issuer" {
-  description = "OIDC issuer URL for the EKS cluster"
-  value       = aws_eks_cluster.example.identity[0].oidc[0].issuer
+  value = aws_eks_cluster.example.identity[0].oidc[0].issuer
 }
