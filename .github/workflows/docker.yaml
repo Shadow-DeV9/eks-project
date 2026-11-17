@@ -1,0 +1,42 @@
+name: Docker Build and Push
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+
+name: Docker Security and EKS Deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  checkov:
+    name: Terraform Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Checkov
+        run: |
+          python -m pip install --upgrade pip
+          pip install checkov
+
+      - name: Scan Terraform infrastructure
+        run: checkov -d terraform --framework terraform
+
+      - name: Scan Terraform addons
+        run: checkov -d terraform-addons --framework terraform
