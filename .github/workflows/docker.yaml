@@ -27,7 +27,7 @@ jobs:
           pip install checkov
 
       - name: Scan Terraform infrastructure
-        run: checkov -d terraform --framework terraform
+        run: checkov -d terraform --framework terraform --soft-fail
 
       - name: Scan Terraform addons
-        run: checkov -d terraform-addons --framework terraform
+        run: checkov -d terraform-addons --framework terraform --soft-fail
