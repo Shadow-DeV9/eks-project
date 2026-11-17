@@ -1,12 +1,3 @@
-name: Docker Build and Push
-on:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  id-token: write
-
-
 name: Docker Security and EKS Deployment
 
 on:
