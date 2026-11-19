@@ -83,6 +83,9 @@ jobs:
 
     env:
       AWS_REGION: eu-north-1
+      ECR_REGISTRY: ${{ needs.docker.outputs.ecr-registry }}
+      ECR_REPOSITORY: senbonzakura-ecr
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout repository
