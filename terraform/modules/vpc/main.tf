@@ -23,7 +23,7 @@ resource "aws_subnet" "public_subnet_a" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.subnet_a_cidr
   availability_zone       = var.availability_zone_a
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name                     = "eks-sn-a"
@@ -35,7 +35,7 @@ resource "aws_subnet" "public_subnet_b" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.subnet_b_cidr
   availability_zone       = var.availability_zone_b
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
     Name                     = "eks-sn-b"
@@ -158,4 +158,72 @@ resource "aws_nat_gateway" "nat_b" {
   tags = {
     Name = "eks-nat-gw-b"
   }
+}
+
+# default security group for the VPC
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  ingress = []
+  egress  = []
+}
+
+# VPC logs
+resource "aws_flow_log" "vpc_flow_log" {
+  log_destination      = aws_cloudwatch_log_group.vpc_flow_logs.arn
+  log_destination_type = "cloud-watch-logs"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.main.id
+}
+
+resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+  name              = "/aws/vpc/flow-logs/${aws_vpc.main.id}"
+  retention_in_days = 7
+}
+
+# VPC IAM role and policy for VPC flow logs
+resource "aws_iam_role" "vpc_flow_logs" {
+  name = "vpc-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "vpc-flow-logs.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "vpc_flow_logs" {
+  name = "vpc-flow-logs-policy"
+  role = aws_iam_role.vpc_flow_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "${aws_cloudwatch_log_group.vpc_flow_logs.arn}:*"
+      }
+    ]
+  })
+}
+
+resource "aws_flow_log" "vpc_flow_log" {
+  log_destination      = aws_cloudwatch_log_group.vpc_flow_logs.arn
+  log_destination_type = "cloud-watch-logs"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.main.id
+  iam_role_arn         = aws_iam_role.vpc_flow_logs.arn
 }
