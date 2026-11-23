@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubespace
+  namespace: argocd
+
+spec:
+  source:
+    repoURL: https://github.com/Shadow-DeV9/eks-project
+    targetRevision: main
+    path: ./k8s
+
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

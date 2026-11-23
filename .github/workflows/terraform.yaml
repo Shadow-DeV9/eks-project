@@ -1,4 +1,3 @@
-
 name: Terraform EKS Deployment
 
 on:
@@ -18,7 +17,6 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-
   # Job 1: Deploy AWS infrastructure
 
   terraform:
@@ -79,7 +77,6 @@ jobs:
       - name: Terraform Apply
         run: terraform apply tfplan
 
-
   # Job 2: Deploy Kubernetes addons
 
   terraform-addons:
@@ -121,3 +118,48 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply tfplan
+
+  # Job 3: Bootstrap ArgoCD
+  argocd-bootstrap:
+    name: argocd
+    runs-on: ubuntu-latest
+    needs: terraform-addons
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::343918153740:role/github-actions-eks-oidc-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.36.0"
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name eks-cluster
+
+      - name: Wait for ArgoCD Application CRD
+        run: |
+          kubectl wait \
+            --for=condition=Established \
+            --timeout=120s \
+            crd/applications.argoproj.io
+
+      - name: Apply ArgoCD Application
+        run: kubectl apply -f argocd/application.yaml
+
+      - name: Verify ArgoCD Application
+        run: kubectl get application kubespace -n argocd
