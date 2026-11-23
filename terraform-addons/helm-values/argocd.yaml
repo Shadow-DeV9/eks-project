@@ -1,0 +1,23 @@
+global:
+  domain: argocd.shoshin.org.uk
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+      nginx.org/ssl-services: "argocd-server"
+      nginx.org/ssl-redirect: "true"
+
+    tls: true
+
+controller:
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1
