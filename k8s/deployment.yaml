@@ -20,7 +20,7 @@ spec:
       
       containers:
         - name: kubespace
-          image: 343918153740.dkr.ecr.eu-north-1.amazonaws.com/senbonzakura-ecr:d3fcf0bb96fbbae2c242c587a28e4c1e08ef8412
+          image: 343918153740.dkr.ecr.eu-north-1.amazonaws.com/senbonzakura-ecr:47c3a72d18a96c10deb46d0c82a21a34fb6796df
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
