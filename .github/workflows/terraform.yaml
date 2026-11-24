@@ -158,6 +158,13 @@ jobs:
             --timeout=120s \
             crd/applications.argoproj.io
 
+      - name: Debug ArgoCD Application
+        run: |
+          echo "Current commit:"
+          git rev-parse HEAD
+          echo "Application manifest:"
+          cat -n argocd/application.yaml
+
       - name: Apply ArgoCD Application
         run: kubectl apply -f argocd/application.yaml
 
