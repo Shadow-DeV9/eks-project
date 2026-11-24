@@ -24,6 +24,16 @@ resource "aws_eks_access_entry" "local_admin" {
   type          = "STANDARD"
 }
 
+resource "aws_eks_access_policy_association" "local_admin" {
+  cluster_name  = aws_eks_cluster.eks-cluster.name
+  principal_arn = aws_eks_access_entry.local_admin.principal_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
 resource "aws_cloudwatch_log_group" "eks_cluster_logs" {
   name              = "/aws/eks/eks-cluster/cluster"
   retention_in_days = 7
