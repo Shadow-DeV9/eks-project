@@ -4,165 +4,1321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KubeSpace | Cloud Status</title>
-
+    <meta name="theme-color" content="#080d18">
+    <title>KubeSpace — Kubernetes Control Plane</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            color-scheme: dark;
+            --bg: #080d18;
+            --panel: #101827;
+            --panel2: #131f31;
+            --line: #233249;
+            --muted: #8190a8;
+            --text: #edf4ff;
+            --cyan: #52d9e8;
+            --blue: #7298ff;
+            --green: #4ade9a;
+            --amber: #f5bd62;
+            --red: #ff7185;
+            --purple: #b69aff;
+            --radius: 17px;
+        }
+
         * {
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0b1120;
-            color: #e5e7eb;
+            background: radial-gradient(ellipse at 70% -15%, #162a47 0, transparent 38%), var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            min-height: 100vh
         }
 
-        header {
-            padding: 24px 8%;
-            border-bottom: 1px solid #263247;
+        button,
+        input {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 250px minmax(0, 1fr);
+            min-height: 100vh
+        }
+
+        aside {
+            border-right: 1px solid var(--line);
+            background: rgba(9, 15, 27, .88);
+            padding: 25px 17px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 30px
+        }
+
+        .brand-mark {
+            width: 37px;
+            height: 37px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #56e0e9, #647dff);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 7px 25px #4bd7e633
+        }
+
+        .brand-mark svg {
+            width: 23px;
+            height: 23px
+        }
+
+        .brand-name {
+            font-weight: 800;
+            letter-spacing: -.5px;
+            font-size: 18px
+        }
+
+        .brand-name span {
+            color: var(--cyan)
+        }
+
+        .workspace {
+            margin: 0 8px 25px;
+            padding: 12px;
+            background: #111d2e;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .workspace-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            background: #233b57;
+            display: grid;
+            place-items: center;
+            color: var(--cyan);
+            font-weight: 800
+        }
+
+        .workspace small,
+        .workspace strong {
+            display: block
+        }
+
+        .workspace small {
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 2px
+        }
+
+        .workspace strong {
+            font-size: 12px
+        }
+
+        .nav-label {
+            font: 10px 'DM Mono', monospace;
+            letter-spacing: 1.5px;
+            color: #62738c;
+            padding: 0 12px 10px
+        }
+
+        .nav {
+            display: grid;
+            gap: 5px
+        }
+
+        .nav button {
+            border: 0;
+            background: transparent;
+            color: #91a0b7;
+            text-align: left;
+            padding: 11px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            transition: .2s
+        }
+
+        .nav button:hover {
+            background: #152238;
+            color: #eaf5ff
+        }
+
+        .nav button.active {
+            background: linear-gradient(90deg, #17364a, #16263d);
+            color: #dffaff;
+            box-shadow: inset 2px 0 var(--cyan)
+        }
+
+        .nav svg {
+            width: 17px;
+            height: 17px;
+            opacity: .9
+        }
+
+        .side-bottom {
+            margin-top: auto
+        }
+
+        .cluster-mini {
+            border: 1px solid var(--line);
+            background: linear-gradient(145deg, #122239, #0f1929);
+            padding: 14px;
+            border-radius: 13px;
+            margin: 15px 4px
+        }
+
+        .cluster-mini .mini-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
+            font-size: 11px;
+            color: #a9b7ca
         }
 
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            color: #60a5fa;
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            display: inline-block;
+            box-shadow: 0 0 10px #4ade9a99;
+            margin-right: 6px
         }
 
-        .badge {
-            color: #86efac;
-            background: #123326;
-            padding: 8px 12px;
-            border-radius: 20px;
+        .cluster-mini strong {
+            display: block;
             font-size: 13px;
+            margin: 10px 0 4px
+        }
+
+        .cluster-mini p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 10px
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 8px 0;
+            border-top: 1px solid var(--line)
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6b7fff, #48d6d5);
+            display: grid;
+            place-items: center;
+            color: #07111e;
+            font-weight: 800;
+            font-size: 12px
+        }
+
+        .profile strong {
+            display: block;
+            font-size: 11px
+        }
+
+        .profile small {
+            font-size: 10px;
+            color: var(--muted)
         }
 
         main {
-            max-width: 1050px;
-            margin: 60px auto;
-            padding: 0 24px;
+            min-width: 0;
+            padding: 27px clamp(20px, 4vw, 56px) 50px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto
         }
 
-        .hero {
-            margin-bottom: 40px;
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 35px
+        }
+
+        .crumb {
+            font: 11px 'DM Mono', monospace;
+            color: var(--muted);
+            letter-spacing: .4px
+        }
+
+        .crumb b {
+            color: #d8e7f8;
+            font-weight: 500
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .region {
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 9px 12px;
+            color: #a9b8cd;
+            font-size: 11px;
+            background: #101a2a
+        }
+
+        .icon-btn {
+            border: 1px solid var(--line);
+            background: #101a2a;
+            color: #a9b8cd;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center
+        }
+
+        .icon-btn:hover,
+        .refresh:hover {
+            border-color: #4b8eaa;
+            color: var(--cyan)
+        }
+
+        .icon-btn svg {
+            width: 16px;
+            height: 16px
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 25px
         }
 
         .eyebrow {
-            color: #60a5fa;
-            text-transform: uppercase;
+            font: 10px 'DM Mono', monospace;
             letter-spacing: 2px;
-            font-size: 12px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 10px
         }
 
         h1 {
-            font-size: clamp(32px, 5vw, 52px);
-            margin: 14px 0;
+            font-size: clamp(27px, 3vw, 38px);
+            letter-spacing: -1.5px;
+            margin: 0;
+            font-weight: 700
         }
 
-        .subtitle {
-            color: #9ca3af;
-            line-height: 1.7;
-            max-width: 600px;
+        .sub {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 13px
         }
 
-        .grid {
+        .refresh {
+            border: 1px solid #2d4a62;
+            background: #10263a;
+            color: #b9f4f5;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .refresh svg {
+            width: 14px;
+            height: 14px
+        }
+
+        .notice {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            background: #17283a;
+            border: 1px solid #2b5262;
+            padding: 11px 14px;
+            border-radius: 11px;
+            color: #a9c8d8;
+            font-size: 11px;
+            margin-bottom: 21px
+        }
+
+        .notice svg {
+            width: 16px;
+            height: 16px;
+            color: var(--cyan);
+            flex: none
+        }
+
+        .notice strong {
+            color: #e0f7fa
+        }
+
+        .metrics {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 17px
         }
 
-        .card {
-            background: #151f32;
-            border: 1px solid #29364d;
-            padding: 24px;
-            border-radius: 16px;
+        .metric,
+        .panel {
+            background: linear-gradient(145deg, rgba(19, 31, 49, .97), rgba(13, 22, 36, .97));
+            border: 1px solid var(--line);
+            border-radius: var(--radius)
         }
 
-        .card-label {
-            color: #9ca3af;
-            font-size: 14px;
+        .metric {
+            padding: 18px 18px 15px;
+            position: relative;
+            overflow: hidden
         }
 
-        .value {
-            font-size: 34px;
-            font-weight: bold;
-            margin: 18px 0 10px;
+        .metric:after {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            right: -40px;
+            top: -45px;
+            background: var(--glow);
+            filter: blur(30px);
+            opacity: .16
         }
 
-        .healthy {
-            color: #86efac;
+        .metric-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #9aaac0;
+            font-size: 11px
         }
 
-        .note {
-            color: #9ca3af;
+        .metric-icon {
+            width: 29px;
+            height: 29px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: var(--icon-bg);
+            color: var(--icon-color)
+        }
+
+        .metric-icon svg {
+            width: 15px;
+            height: 15px
+        }
+
+        .metric-value {
+            font-size: 27px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 13px 0 4px
+        }
+
+        .metric-foot {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 10px
+        }
+
+        .trend {
+            color: var(--green);
+            font-family: 'DM Mono', monospace
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(280px, .85fr);
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .panel {
+            padding: 19px;
+            min-width: 0
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+
+        .panel-title {
             font-size: 13px;
+            font-weight: 700
+        }
+
+        .panel-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .select {
+            border: 1px solid var(--line);
+            background: #0d1726;
+            color: #9bacc2;
+            border-radius: 8px;
+            padding: 7px 9px;
+            font-size: 10px
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+            color: var(--muted);
+            font-size: 10px
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 2px;
+            margin-right: 5px
+        }
+
+        .chart-wrap {
+            height: 190px;
+            position: relative
+        }
+
+        .chart-wrap svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible
+        }
+
+        .chart-grid {
+            stroke: #26364b;
+            stroke-width: 1;
+            stroke-dasharray: 3 5
+        }
+
+        .chart-label {
+            fill: #71829a;
+            font: 9px 'DM Mono', monospace
+        }
+
+        .line-a {
+            fill: none;
+            stroke: var(--cyan);
+            stroke-width: 2.5;
+            stroke-linecap: round
+        }
+
+        .line-b {
+            fill: none;
+            stroke: var(--blue);
+            stroke-width: 2.5;
+            stroke-linecap: round
+        }
+
+        .area-a {
+            fill: url(#areaA)
+        }
+
+        .area-b {
+            fill: url(#areaB)
+        }
+
+        .health-list {
+            display: grid;
+            gap: 15px
+        }
+
+        .health-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px
+        }
+
+        .health-left {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .health-icon {
+            width: 31px;
+            height: 31px;
+            border-radius: 9px;
+            background: #17283b;
+            color: #83c8d9;
+            display: grid;
+            place-items: center
+        }
+
+        .health-icon svg {
+            width: 15px;
+            height: 15px
+        }
+
+        .health-left strong {
+            display: block;
+            font-size: 11px
+        }
+
+        .health-left small {
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            margin-top: 3px
+        }
+
+        .status {
+            font: 9px 'DM Mono', monospace;
+            border-radius: 20px;
+            padding: 5px 8px;
+            background: #15372e;
+            color: var(--green);
+            white-space: nowrap
+        }
+
+        .status.warn {
+            background: #3a3020;
+            color: var(--amber)
+        }
+
+        .lower-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(280px, .85fr);
+            gap: 16px
+        }
+
+        .table-wrap {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap
+        }
+
+        th {
+            text-align: left;
+            color: #71829a;
+            font: 9px 'DM Mono', monospace;
+            letter-spacing: .7px;
+            padding: 0 10px 12px
+        }
+
+        td {
+            border-top: 1px solid #202e42;
+            padding: 12px 10px;
+            font-size: 10px;
+            color: #b6c4d7
+        }
+
+        td:first-child {
+            color: #edf4ff;
+            font-weight: 600
+        }
+
+        .pod-name {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .pod-symbol {
+            width: 23px;
+            height: 23px;
+            border-radius: 7px;
+            background: #1d3047;
+            color: #78d9e2;
+            display: grid;
+            place-items: center;
+            font-size: 10px
+        }
+
+        .tiny-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--green)
+        }
+
+        .tiny-status:before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            background: var(--green);
+            border-radius: 50%
+        }
+
+        .node-list {
+            display: grid;
+            gap: 12px
+        }
+
+        .node {
+            border: 1px solid #24344a;
+            background: #0e1929;
+            border-radius: 12px;
+            padding: 12px
+        }
+
+        .node-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px
+        }
+
+        .node-name {
+            font: 10px 'DM Mono', monospace;
+            color: #d8e7f8
+        }
+
+        .node-type {
+            font-size: 9px;
+            color: var(--muted)
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+            font-size: 9px;
+            margin: 8px 0 5px
+        }
+
+        .bar {
+            height: 5px;
+            background: #243247;
+            border-radius: 10px;
+            overflow: hidden
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #48d4dc, #718fff)
+        }
+
+        .activity {
+            display: grid;
+            gap: 15px
+        }
+
+        .event {
+            display: grid;
+            grid-template-columns: 24px 1fr;
+            gap: 10px;
+            position: relative
+        }
+
+        .event:not(:last-child):after {
+            content: "";
+            position: absolute;
+            left: 11px;
+            top: 25px;
+            bottom: -14px;
+            width: 1px;
+            background: #2a3b51
+        }
+
+        .event-icon {
+            width: 23px;
+            height: 23px;
+            border-radius: 7px;
+            background: #17372f;
+            color: var(--green);
+            display: grid;
+            place-items: center;
+            z-index: 1
+        }
+
+        .event-icon svg {
+            width: 12px;
+            height: 12px
+        }
+
+        .event-icon.blue {
+            background: #1a2d4b;
+            color: #82a5ff
+        }
+
+        .event-icon.amber {
+            background: #3a3020;
+            color: var(--amber)
+        }
+
+        .event strong {
+            font-size: 10px;
+            display: block;
+            margin: 1px 0 4px
+        }
+
+        .event p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 9px;
+            line-height: 1.5
+        }
+
+        .event time {
+            font: 9px 'DM Mono', monospace;
+            color: #65758d;
+            display: block;
+            margin-top: 5px
         }
 
         footer {
-            margin-top: 60px;
-            border-top: 1px solid #263247;
-            padding-top: 24px;
-            color: #9ca3af;
-            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 17px;
+            border-top: 1px solid var(--line);
+            font-size: 9px;
+            color: #65758d
+        }
+
+        footer span {
+            font-family: 'DM Mono', monospace
+        }
+
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            background: #14352e;
+            border: 1px solid #28634f;
+            color: #b8f5d8;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 11px;
+            box-shadow: 0 12px 35px #0008;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: .25s;
+            pointer-events: none
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        @media(max-width:1100px) {
+            .metrics {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+
+            .content-grid,
+            .lower-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:720px) {
+            .app {
+                grid-template-columns: 1fr
+            }
+
+            aside {
+                padding: 13px 15px;
+                border-right: 0;
+                border-bottom: 1px solid var(--line)
+            }
+
+            .brand {
+                padding: 0 4px 12px
+            }
+
+            .workspace,
+            .nav-label,
+            .side-bottom {
+                display: none
+            }
+
+            .nav {
+                display: flex;
+                overflow: auto
+            }
+
+            .nav button {
+                white-space: nowrap;
+                padding: 9px 10px;
+                font-size: 11px
+            }
+
+            .nav button svg {
+                width: 14px;
+                height: 14px
+            }
+
+            main {
+                padding: 22px 15px 35px
+            }
+
+            .topbar {
+                margin-bottom: 25px
+            }
+
+            .heading {
+                align-items: flex-start
+            }
+
+            .region {
+                display: none
+            }
+
+            .metrics {
+                gap: 9px
+            }
+
+            .metric {
+                padding: 14px
+            }
+
+            .metric-value {
+                font-size: 23px
+            }
+
+            .metric-head {
+                font-size: 10px
+            }
+
+            .panel {
+                padding: 15px
+            }
+
+            .chart-wrap {
+                height: 165px
+            }
+
+            footer {
+                flex-direction: column
+            }
+        }
+
+        @media(max-width:420px) {
+            .metrics {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .heading h1 {
+                font-size: 27px
+            }
+
+            .refresh {
+                padding: 9px;
+                font-size: 0
+            }
+
+            .refresh svg {
+                width: 16px;
+                height: 16px
+            }
+
+            .chart-legend {
+                gap: 8px
+            }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="logo">☁ KubeSpace</div>
-        <div class="badge">● Demo environment</div>
-    </header>
+    <div class="app">
+        <aside>
+            <div class="brand">
+                <div class="brand-mark">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#071522" stroke-width="2">
+                        <path d="M12 2.8 20 7v10l-8 4.2L4 17V7l8-4.2Z" />
+                        <path d="m4.5 7.3 7.5 4 7.5-4M12 11.5v9" />
+                    </svg>
+                </div>
+                <div class="brand-name">Kube<span>Space</span></div>
+            </div>
+            <div class="workspace">
+                <div class="workspace-icon">K</div>
+                <div><small>WORKSPACE</small><strong>Shoshin / Platform</strong></div>
+                <span style="margin-left:auto;color:#70839c">⌄</span>
+            </div>
+            <div class="nav-label">PLATFORM</div>
+            <nav class="nav" aria-label="Main navigation">
+                <button class="active" data-view="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.7">
+                        <rect x="3" y="3" width="8" height="8" rx="2" />
+                        <rect x="14" y="3" width="7" height="5" rx="2" />
+                        <rect x="14" y="11" width="7" height="10" rx="2" />
+                        <rect x="3" y="14" width="8" height="7" rx="2" />
+                    </svg>Overview</button>
+                <button data-view="Workloads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.7">
+                        <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+                        <path d="m3 12 9 5 9-5M3 16l9 5 9-5" />
+                    </svg>Workloads</button>
+                <button data-view="Nodes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                        <rect x="3" y="4" width="18" height="6" rx="2" />
+                        <rect x="3" y="14" width="18" height="6" rx="2" />
+                        <path d="M7 7h.01M7 17h.01M11 7h6M11 17h6" />
+                    </svg>Nodes</button>
+                <button data-view="Networking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.7">
+                        <circle cx="5" cy="12" r="2.5" />
+                        <circle cx="19" cy="5" r="2.5" />
+                        <circle cx="19" cy="19" r="2.5" />
+                        <path d="m7.3 10.8 9.4-4.6M7.3 13.2l9.4 4.6" />
+                    </svg>Networking</button>
+                <button data-view="Observability"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.7">
+                        <path d="M3 12h3l3-8 5 16 3-8h4" />
+                    </svg>Observability <span style="margin-left:auto;font-size:9px;color:#7c91aa">SOON</span></button>
+            </nav>
+            <div class="side-bottom">
+                <div class="cluster-mini">
+                    <div class="mini-top"><span>CLUSTER STATUS</span><span><i class="dot"></i>Healthy</span></div>
+                    <strong>eks-cluster</strong>
+                    <p>eu-north-1 · Kubernetes 1.36</p>
+                </div>
+                <div class="profile">
+                    <div class="avatar">SD</div>
+                    <div><strong>Platform Engineer</strong><small>Personal workspace</small></div>
+                    <span style="margin-left:auto;color:#71829a">•••</span>
+                </div>
+            </div>
+        </aside>
 
-    <main>
-        <section class="hero">
-            <div class="eyebrow">Cloud infrastructure</div>
-            <h1>Your infrastructure,<br>at a glance.</h1>
-            <p class="subtitle">
-                Welcome to KubeSpace, a simple dashboard built with Node.js
-                and prepared for containerisation and Kubernetes deployment.
-            </p>
-        </section>
+        <main>
+            <div class="topbar">
+                <div class="crumb">CLUSTERS <span style="color:#52647d">/</span> <b>eks-cluster</b> <span
+                        style="color:#52647d">/</span> Overview</div>
+                <div class="top-actions">
+                    <div class="region">⌖ &nbsp; eu-north-1</div>
+                    <button class="icon-btn" id="helpBtn" aria-label="Information" title="About this preview"><svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.8 1.3-1.8 2.7M12 17h.01" />
+                        </svg></button>
+                </div>
+            </div>
 
-        <section class="grid">
-            <article class="card">
-                <div class="card-label">Application status</div>
-                <div class="value healthy">Online</div>
-                <div class="note">Demo status</div>
-            </article>
+            <section class="heading">
+                <div>
+                    <div class="eyebrow">CONTROL PLANE / LIVE VIEW</div>
+                    <h1>Cluster overview<span style="color:var(--cyan)">.</span></h1>
+                    <p class="sub">A clearer view of what's happening across your Kubernetes environment.</p>
+                </div>
+                <button class="refresh" id="refreshBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8">
+                        <path d="M20 7v5h-5M4 17v-5h5" />
+                        <path d="M5.6 9a7 7 0 0 1 11.8-2L20 12M4 12l2.6 5a7 7 0 0 0 11.8-2" />
+                    </svg>Refresh view</button>
+            </section>
 
-            <article class="card">
-                <div class="card-label">Demo Pods</div>
-                <div class="value">3 / 3</div>
-                <div class="note">Illustrative data only</div>
-            </article>
+            <div class="notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 10v6M12 7h.01" />
+                </svg>
+                <span><strong>Preview environment:</strong> the figures and activity below are illustrative UI data, not
+                    live Kubernetes metrics. Prometheus integration is planned for the next project phase.</span>
+            </div>
 
-            <article class="card">
-                <div class="card-label">Demo deployment</div>
-                <div class="value">Ready</div>
-                <div class="note">Illustrative data only</div>
-            </article>
-        </section>
+            <section class="metrics">
+                <article class="metric" style="--glow:#4ade9a;--icon-bg:#15372f;--icon-color:#4ade9a">
+                    <div class="metric-head"><span>Cluster health</span><span class="metric-icon"><svg
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="m5 12 4 4L19 6" />
+                            </svg></span></div>
+                    <div class="metric-value">Healthy</div>
+                    <div class="metric-foot"><span class="trend">● Operational</span><span>· all systems nominal</span>
+                    </div>
+                </article>
+                <article class="metric" style="--glow:#52d9e8;--icon-bg:#153541;--icon-color:#52d9e8">
+                    <div class="metric-head"><span>Running pods</span><span class="metric-icon"><svg viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+                                <path d="m4.5 7.7 7.5 4.2 7.5-4.2M12 12v9" />
+                            </svg></span></div>
+                    <div class="metric-value">12 <span style="font-size:13px;color:#6f8098;font-weight:500">/ 12</span>
+                    </div>
+                    <div class="metric-foot"><span class="trend">100%</span><span>· demo pod readiness</span></div>
+                </article>
+                <article class="metric" style="--glow:#7298ff;--icon-bg:#202e4e;--icon-color:#8caaff">
+                    <div class="metric-head"><span>Worker nodes</span><span class="metric-icon"><svg viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="3" y="4" width="18" height="6" rx="2" />
+                                <rect x="3" y="14" width="18" height="6" rx="2" />
+                                <path d="M7 7h.01M7 17h.01" />
+                            </svg></span></div>
+                    <div class="metric-value">2 <span style="font-size:13px;color:#6f8098;font-weight:500">nodes</span>
+                    </div>
+                    <div class="metric-foot"><span class="trend">● Ready</span><span>· demo node status</span></div>
+                </article>
+                <article class="metric" style="--glow:#b69aff;--icon-bg:#30274b;--icon-color:#b69aff">
+                    <div class="metric-head"><span>Deployments</span><span class="metric-icon"><svg viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7" />
+                            </svg></span></div>
+                    <div class="metric-value">4 <span style="font-size:13px;color:#6f8098;font-weight:500">ready</span>
+                    </div>
+                    <div class="metric-foot"><span class="trend">100%</span><span>· desired replicas available</span>
+                    </div>
+                </article>
+            </section>
 
-        <footer>
-            KubeSpace · Built with Node.js ·
-            <span id="clock"></span>
-            <p>Infrastructure metrics shown here are examples, not live cluster data.</p>
-        </footer>
-    </main>
+            <section class="content-grid">
+                <article class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <div class="panel-title">Resource utilisation</div>
+                            <div class="panel-sub">Illustrative CPU and memory usage over time</div>
+                        </div>
+                        <select class="select" id="rangeSelect" aria-label="Chart time range">
+                            <option>Last 1 hour</option>
+                            <option>Last 6 hours</option>
+                            <option>Last 24 hours</option>
+                        </select>
+                    </div>
+                    <div class="chart-legend"><span><i class="legend-dot" style="background:var(--cyan)"></i>CPU
+                            usage</span><span><i class="legend-dot" style="background:var(--blue)"></i>Memory
+                            usage</span></div>
+                    <div class="chart-wrap">
+                        <svg viewBox="0 0 700 190" preserveAspectRatio="none" role="img"
+                            aria-label="Illustrative CPU and memory usage line chart">
+                            <defs>
+                                <linearGradient id="areaA" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0" stop-color="#52d9e8" stop-opacity=".22" />
+                                    <stop offset="1" stop-color="#52d9e8" stop-opacity="0" />
+                                </linearGradient>
+                                <linearGradient id="areaB" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0" stop-color="#7298ff" stop-opacity=".18" />
+                                    <stop offset="1" stop-color="#7298ff" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path class="chart-grid" d="M35 20H690M35 60H690M35 100H690M35 140H690" />
+                            <text class="chart-label" x="2" y="23">100%</text><text class="chart-label" x="9"
+                                y="63">75%</text><text class="chart-label" x="9" y="103">50%</text><text
+                                class="chart-label" x="9" y="143">25%</text>
+                            <path class="area-a"
+                                d="M35 121 C75 112 82 95 125 101 S190 126 230 91 S290 75 335 87 S400 109 445 76 S510 68 550 84 S625 58 690 64 L690 160 L35 160Z" />
+                            <path class="area-b"
+                                d="M35 82 C80 88 90 75 125 79 S190 72 230 82 S290 66 335 71 S400 59 445 65 S510 52 550 61 S625 47 690 51 L690 160 L35 160Z" />
+                            <path class="line-a"
+                                d="M35 121 C75 112 82 95 125 101 S190 126 230 91 S290 75 335 87 S400 109 445 76 S510 68 550 84 S625 58 690 64" />
+                            <path class="line-b"
+                                d="M35 82 C80 88 90 75 125 79 S190 72 230 82 S290 66 335 71 S400 59 445 65 S510 52 550 61 S625 47 690 51" />
+                            <text class="chart-label" x="35" y="180">-60m</text><text class="chart-label" x="190"
+                                y="180">-45m</text><text class="chart-label" x="355" y="180">-30m</text><text
+                                class="chart-label" x="520" y="180">-15m</text><text class="chart-label" x="670"
+                                y="180">Now</text>
+                        </svg>
+                    </div>
+                </article>
+                <article class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <div class="panel-title">Platform health</div>
+                            <div class="panel-sub">Core Kubernetes components · demo state</div>
+                        </div><span class="status">ALL HEALTHY</span>
+                    </div>
+                    <div class="health-list">
+                        <div class="health-row">
+                            <div class="health-left">
+                                <div class="health-icon">◈</div>
+                                <div><strong>API server</strong><small>Control plane endpoint</small></div>
+                            </div><span class="status">Operational</span>
+                        </div>
+                        <div class="health-row">
+                            <div class="health-left">
+                                <div class="health-icon">⌘</div>
+                                <div><strong>Scheduler</strong><small>Pod placement</small></div>
+                            </div><span class="status">Operational</span>
+                        </div>
+                        <div class="health-row">
+                            <div class="health-left">
+                                <div class="health-icon">⛓</div>
+                                <div><strong>Controller manager</strong><small>Desired state reconciliation</small>
+                                </div>
+                            </div><span class="status">Operational</span>
+                        </div>
+                        <div class="health-row">
+                            <div class="health-left">
+                                <div class="health-icon">⇄</div>
+                                <div><strong>NGINX Ingress</strong><small>External traffic routing</small></div>
+                            </div><span class="status">Operational</span>
+                        </div>
+                        <div class="health-row">
+                            <div class="health-left">
+                                <div class="health-icon">↗</div>
+                                <div><strong>Argo CD</strong><small>GitOps reconciliation</small></div>
+                            </div><span class="status">Synced</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
 
+            <section class="lower-grid">
+                <article class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <div class="panel-title">Workloads</div>
+                            <div class="panel-sub">Sample application workloads across the cluster</div>
+                        </div><span class="status">4 DEPLOYMENTS</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>WORKLOAD</th>
+                                    <th>NAMESPACE</th>
+                                    <th>READY</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="pod-name"><span class="pod-symbol">⬡</span> kubespace</span></td>
+                                    <td>default</td>
+                                    <td>3 / 3</td>
+                                    <td><span class="tiny-status">Running</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="pod-name"><span class="pod-symbol">↗</span> ingress-nginx</span>
+                                    </td>
+                                    <td>ingress-nginx</td>
+                                    <td>2 / 2</td>
+                                    <td><span class="tiny-status">Running</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="pod-name"><span class="pod-symbol">◉</span> cert-manager</span>
+                                    </td>
+                                    <td>cert-manager</td>
+                                    <td>1 / 1</td>
+                                    <td><span class="tiny-status">Running</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="pod-name"><span class="pod-symbol">⎈</span> argocd-server</span>
+                                    </td>
+                                    <td>argocd</td>
+                                    <td>1 / 1</td>
+                                    <td><span class="tiny-status">Running</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+                <article class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <div class="panel-title">Cluster activity</div>
+                            <div class="panel-sub">Example platform events</div>
+                        </div><span style="font:9px 'DM Mono';color:#71829a">RECENT</span>
+                    </div>
+                    <div class="activity">
+                        <div class="event">
+                            <div class="event-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="m5 12 4 4L19 6" />
+                                </svg></div>
+                            <div><strong>Application synced</strong>
+                                <p>Argo CD reports KubeSpace is in sync with Git.</p><time>2 MIN AGO</time>
+                            </div>
+                        </div>
+                        <div class="event">
+                            <div class="event-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 3v18M3 12h18" />
+                                </svg></div>
+                            <div><strong>Deployment available</strong>
+                                <p>All desired KubeSpace replicas are available.</p><time>18 MIN AGO</time>
+                            </div>
+                        </div>
+                        <div class="event">
+                            <div class="event-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 8v5m0 3h.01" />
+                                    <path d="M10 3h4l8 15H2L10 3Z" />
+                                </svg></div>
+                            <div><strong>Observability upgrade pending</strong>
+                                <p>Prometheus and Grafana are planned for the next phase.</p><time>UP NEXT</time>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+            <footer><span>KUBESPACE PLATFORM CONSOLE</span><span>UI PREVIEW · NOT CONNECTED TO CLUSTER
+                    TELEMETRY</span><span id="clock">--:--:-- UTC</span></footer>
+        </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite">Preview refreshed.</div>
     <script>
+        const clock = document.getElementById('clock');
         function updateClock() {
-            document.getElementById("clock").textContent =
-                new Date().toLocaleTimeString();
+            clock.textContent = new Date().toLocaleString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            });
         }
-
         updateClock();
         setInterval(updateClock, 1000);
+
+        const toast = document.getElementById('toast');
+        let toastTimer;
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        }
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            showToast('Preview refreshed — live metrics will arrive with Prometheus.');
+        });
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            showToast('This is a visual preview using illustrative data, not live cluster telemetry.');
+        });
+        document.querySelectorAll('.nav button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.nav button').forEach(item => item.classList.remove('active'));
+                button.classList.add('active');
+                showToast(button.dataset.view + ' view is part of the KubeSpace UI preview.');
+            });
+        });
+        document.getElementById('rangeSelect').addEventListener('change', event => {
+            showToast(event.target.value + ' selected — chart uses illustrative preview data.');
+        });
     </script>
 </body>
 
