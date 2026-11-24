@@ -18,6 +18,12 @@ resource "aws_eks_cluster" "eks-cluster" {
   }
 }
 
+resource "aws_eks_access_entry" "local_admin" {
+  cluster_name  = aws_eks_cluster.eks-cluster.name
+  principal_arn = var.admin_principal_arn
+  type          = "STANDARD"
+}
+
 resource "aws_cloudwatch_log_group" "eks_cluster_logs" {
   name              = "/aws/eks/eks-cluster/cluster"
   retention_in_days = 7

@@ -13,3 +13,8 @@ variable "private_subnet_ids" {
   description = "Private subnet IDs used by the EKS cluster and worker nodes"
   type        = list(string)
 }
+
+variable "admin_principal_arn" {
+  description = "IAM principal that should have EKS administrator access"
+  type        = string
+}

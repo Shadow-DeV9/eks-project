@@ -16,6 +16,7 @@ override.tf.json
 # Terraform CLI configuration (may contain credentials)
 .terraformrc
 terraform.rc
+terraform.tfvars
 
 # Secrets and environment variables
 .env
