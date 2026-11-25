@@ -63,6 +63,9 @@ jobs:
       run:
         working-directory: ./terraform
 
+    env:
+      TF_VAR_admin_principal_arn: ${{ secrets.EKS_ADMIN_PRINCIPAL_ARN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
