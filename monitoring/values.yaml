@@ -12,9 +12,26 @@ prometheus:
         cpu: 500m
         memory: 512Mi
 
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+
 grafana:
   enabled: true
   replicas: 1
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: gp3
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
   resources:
     requests:
       cpu: 50m
