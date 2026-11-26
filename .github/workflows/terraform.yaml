@@ -173,3 +173,6 @@ jobs:
 
       - name: Verify ArgoCD Application
         run: kubectl get application kubespace -n argocd
+
+      - name: Apply ArgoCD Monitoring
+        run: kubectl apply -f argocd/monitoring.yaml
