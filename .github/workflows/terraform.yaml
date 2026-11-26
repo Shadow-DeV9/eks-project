@@ -168,11 +168,42 @@ jobs:
           echo "Application manifest:"
           cat -n argocd/application.yaml
 
-      - name: Apply ArgoCD Application
-        run: kubectl apply -f argocd/application.yaml
+      - name: Apply ArgoCD Monitoring Resources
+        run: kubectl apply -f argocd/monitoring-resources.yaml
 
-      - name: Verify ArgoCD Application
-        run: kubectl get application kubespace -n argocd
+      - name: Wait for Monitoring Resources
+        run: |
+          kubectl wait \
+            --for=jsonpath='{.status.sync.status}'=Synced \
+            application/monitoring-resources \
+            -n argocd \
+            --timeout=300s
+
+          kubectl wait \
+            --for=jsonpath='{.status.health.status}'=Healthy \
+            application/monitoring-resources \
+            -n argocd \
+            --timeout=300s
 
       - name: Apply ArgoCD Monitoring
         run: kubectl apply -f argocd/monitoring.yaml
+
+      - name: Wait for Monitoring
+        run: |
+          kubectl wait \
+            --for=jsonpath='{.status.sync.status}'=Synced \
+            application/monitoring \
+            -n argocd \
+            --timeout=600s
+
+          kubectl wait \
+            --for=jsonpath='{.status.health.status}'=Healthy \
+            application/monitoring \
+            -n argocd \
+            --timeout=600s
+
+      - name: Apply ArgoCD KubeSpace
+        run: kubectl apply -f argocd/application.yaml
+
+      - name: Verify ArgoCD Applications
+        run: kubectl get applications -n argocd
