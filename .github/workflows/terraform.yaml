@@ -154,6 +154,8 @@ jobs:
             --region ${{ env.AWS_REGION }} \
             --name eks-cluster
 
+      # Argo CD config
+
       - name: Wait for ArgoCD Application CRD
         run: |
           kubectl wait \
@@ -201,6 +203,30 @@ jobs:
             application/monitoring \
             -n argocd \
             --timeout=600s
+
+      - name: Wait for ServiceMonitor CRD
+        run: |
+          kubectl wait \
+            --for=condition=Established \
+            --timeout=120s \
+            crd/servicemonitors.monitoring.coreos.com
+
+      - name: Apply ArgoCD Monitoring ServiceMonitor
+        run: kubectl apply -f argocd/monitoring-servicemonitor.yaml
+
+      - name: Wait for Monitoring ServiceMonitor
+        run: |
+          kubectl wait \
+            --for=jsonpath='{.status.sync.status}'=Synced \
+            application/monitoring-servicemonitor \
+            -n argocd \
+            --timeout=300s
+
+          kubectl wait \
+            --for=jsonpath='{.status.health.status}'=Healthy \
+            application/monitoring-servicemonitor \
+            -n argocd \
+            --timeout=300s
 
       - name: Apply ArgoCD KubeSpace
         run: kubectl apply -f argocd/application.yaml

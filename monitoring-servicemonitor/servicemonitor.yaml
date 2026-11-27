@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: f5-nginx-monitor
+  namespace: monitoring
+  labels:
+    app: f5-nginx-monitor
+
+spec:
+  namespaceSelector:
+    matchNames:
+      - nginx-ingress
+
+  selector:
+    matchLabels:
+      service: nginx-ingress-prometheus-service
+
+  endpoints:
+    - port: prometheus
+      path: /metrics
+      scheme: http
+      interval: 30s
