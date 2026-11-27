@@ -1,3 +1,11 @@
 controller:
   service:
     type: LoadBalancer
+
+prometheus:
+  create: true
+  port: 9113
+  scheme: http
+
+  service:
+    create: true

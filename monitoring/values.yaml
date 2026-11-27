@@ -11,6 +11,8 @@ prometheus:
       limits:
         cpu: 500m
         memory: 512Mi
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
 
     storageSpec:
       volumeClaimTemplate:
